@@ -2,7 +2,7 @@ import { StatusBar } from 'expo-status-bar';
 import React, { useState } from 'react';
 import { Image, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
-const Profile = () => {
+const Profile = ({ navigation }) => {
     const [name, setName] = useState("");
     return (
         <View style={styles.container}>
@@ -19,9 +19,9 @@ const Profile = () => {
             <TouchableOpacity
                 style={styles.loginBtn}
                 onPress={() => {
-
+                    navigation.navigate('ChatList')
                 }}>
-                <Text>Save</Text>
+                <Text style={[{ color: 'white' }]}>Save</Text>
             </TouchableOpacity>
         </View>
     );
@@ -65,7 +65,7 @@ const styles = StyleSheet.create({
         alignItems: "center",
         justifyContent: "center",
         marginTop: 40,
-        backgroundColor: "aquamarine",
+        backgroundColor: "#2f99af",
     },
 });
 

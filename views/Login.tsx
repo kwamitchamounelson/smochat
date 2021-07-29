@@ -10,7 +10,7 @@ import {
     Text,
 } from "react-native";
 import PhoneInput from "react-native-phone-number-input";
-import PinInput from "react-pin-input";
+import { color } from "react-native-reanimated";
 
 const Login: React.FC = ({ navigation }) => {
     const [value, setValue] = useState("");
@@ -24,7 +24,7 @@ const Login: React.FC = ({ navigation }) => {
     return (
         <>
             <View style={styles.container}>
-                <Image style={styles.image} source={require("../assets/favicon.png")} />
+                <Image style={styles.image} source={require("../assets/logo.png")} />
 
                 <View
                     style={[{ display: validation ? 'none' : 'flex' }, { marginBottom: 40 }]}
@@ -79,7 +79,7 @@ const Login: React.FC = ({ navigation }) => {
                             navigation.navigate('Profile')
                         }
                     }}>
-                    <Text>{validation ? 'Verify' : 'Next'}</Text>
+                    <Text style={[{ color: 'white' }]}>{validation ? 'Verify' : 'Next'}</Text>
                 </TouchableOpacity>
 
             </View>
@@ -98,6 +98,8 @@ const styles = StyleSheet.create({
 
     image: {
         marginBottom: 90,
+        width: 100,
+        height: 100
     },
 
     inputView: {
@@ -124,7 +126,7 @@ const styles = StyleSheet.create({
         alignItems: "center",
         justifyContent: "center",
         marginTop: 40,
-        backgroundColor: "aquamarine",
+        backgroundColor: "#2f99af",
     },
     error: {
         color: "red",
