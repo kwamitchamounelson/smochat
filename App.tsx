@@ -7,6 +7,7 @@ import Profile from './views/Profile';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import ChatList from './views/ChatList';
+import Chat from './views/Chat';
 
 
 const Stack = createStackNavigator();
@@ -29,6 +30,11 @@ export default function App() {
         <Stack.Screen name="ChatList"
           component={ChatList}
           options={{ title: 'ChatList' }}
+        />
+
+        <Stack.Screen name="Chat"
+          component={Chat}
+          options={{ title: 'Chat' }}
         />
       </Stack.Navigator>
     </NavigationContainer>

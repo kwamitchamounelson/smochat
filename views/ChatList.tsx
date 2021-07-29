@@ -1,9 +1,9 @@
 import { StatusBar } from 'expo-status-bar';
 import React, { useEffect, useState } from 'react';
-import { FlatList, Image, StyleSheet, Text, View } from 'react-native';
+import { FlatList, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import ChatEntity from '../entities/ChatEntity';
 
-const ChatList = () => {
+const ChatList = ({ navigation }) => {
     const [chats, setChats] = useState<ChatEntity[]>([]);
 
     const getChats = async () => {
@@ -30,7 +30,11 @@ const ChatList = () => {
                 keyExtractor={({ id }) => id}
 
                 renderItem={({ item }) =>
-                    <View style={styles.item}>
+                    <TouchableOpacity style={styles.item}
+                        onPress={() => {
+                            navigation.navigate('Chat')
+                        }}
+                    >
                         <Image style={styles.image} source={require("../assets/profil.png")} />
                         <View>
                             <Text style={styles.name}>{item.name}</Text>
@@ -39,7 +43,7 @@ const ChatList = () => {
                                 <Text style={styles.date}>20 Mai</Text>
                             </View>
                         </View>
-                    </View>
+                    </TouchableOpacity>
                 }
             />
         </View>
