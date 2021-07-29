@@ -10,11 +10,13 @@ import {
     Text,
 } from "react-native";
 import PhoneInput from "react-native-phone-number-input";
+import PinInput from "react-pin-input";
 
-const Login: React.FC = () => {
+const Login: React.FC = ({ navigation }) => {
     const [value, setValue] = useState("");
     const [formattedValue, setFormattedValue] = useState("");
-    const [valid, setValid] = useState(false);
+    const [code, setCode] = useState("");
+    const [showError, setShowError] = useState(false);
     const phoneInput = useRef<PhoneInput>(null);
 
     const [validation, setValidation] = useState(false);
@@ -23,37 +25,59 @@ const Login: React.FC = () => {
         <>
             <View style={styles.container}>
                 <Image style={styles.image} source={require("../assets/favicon.png")} />
-                {/* <View style={styles.inputView}>
+
+                <View
+                    style={[{ display: validation ? 'none' : 'flex' }, { marginBottom: 40 }]}
+
+                >
+                    <PhoneInput
+                        ref={phoneInput}
+                        defaultValue={value}
+                        defaultCode="CM"
+                        layout="first"
+                        onChangeText={(text) => {
+                            setValue(text);
+                            setShowError(false);
+                        }}
+                        onChangeFormattedText={(text) => {
+                            setFormattedValue(text);
+                            console.log(text)
+                        }}
+                        withDarkTheme
+                        withShadow
+                        autoFocus
+                    />
+                    <Text style={[styles.error, { display: showError ? 'flex' : 'none' }]}>Invalid phone number</Text>
+                </View>
+
+
+                <View style={[styles.inputView, { display: validation ? 'flex' : 'none' }]}>
                     <TextInput
                         style={styles.TextInput}
-                        placeholder="Phone number"
+                        placeholder="Enter code"
                         placeholderTextColor="#003f5c"
-                        keyboardType={'phone-pad'}
-                        onChangeText={(phone) => setPhone(phone)}
+                        keyboardType={'number-pad'}
+                        onChangeText={(code) => setCode(code)}
                     />
-                </View> */}
+                </View>
 
-                <PhoneInput
-                    ref={phoneInput}
-                    defaultValue={value}
-                    defaultCode="CM"
-                    layout="first"
-                    onChangeText={(text) => {
-                        setValue(text);
-                    }}
-                    onChangeFormattedText={(text) => {
-                        setFormattedValue(text);
-                    }}
-                    withDarkTheme
-                    withShadow
-                    autoFocus
-                />
+
 
 
                 <TouchableOpacity
                     style={styles.loginBtn}
                     onPress={() => {
-                        setValidation(true)
+                        if (!validation) {
+                            const checkValid = phoneInput.current?.isValidNumber(value) || false;
+                            if (checkValid) {
+                                //TODO call server with user phone number
+                            }
+                            setValidation(checkValid);
+                            setShowError(!checkValid);
+                        } else {
+                            //TODO virify entered code
+                            navigation.navigate('Profile')
+                        }
                     }}>
                     <Text>{validation ? 'Verify' : 'Next'}</Text>
                 </TouchableOpacity>
@@ -84,7 +108,6 @@ const styles = StyleSheet.create({
         width: "70%",
         height: 45,
         marginBottom: 20,
-
         alignItems: "center",
     },
 
@@ -92,7 +115,6 @@ const styles = StyleSheet.create({
         height: 50,
         flex: 1,
         padding: 10,
-        marginLeft: 20,
     },
 
     loginBtn: {
@@ -104,6 +126,10 @@ const styles = StyleSheet.create({
         marginTop: 40,
         backgroundColor: "aquamarine",
     },
+    error: {
+        color: "red",
+        marginTop: 10
+    }
 });
 
 export default Login;
