@@ -1,17 +1,17 @@
 import { StatusBar } from 'expo-status-bar';
 import React, { useEffect, useState } from 'react';
 import { FlatList, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import ChatEntity from '../entities/ChatEntity';
+import { ChatEntity } from '../entities/ChatEntity';
 
 const ChatList = ({ navigation }) => {
     const [chats, setChats] = useState<ChatEntity[]>([]);
 
     const getChats = async () => {
-        const range = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+        // generation of elments to build list of items
+        const range = Array.from(Array(20).keys());
         const datas: ChatEntity[] = range.map((value) => {
-            return new ChatEntity("" + value, 'toto', '')
+            return new ChatEntity("" + value, 'toto ' + value, 'https://randomuser.me/api/portraits/women/' + value + '.jpg')
         })
-
 
         setChats(datas)
     };
@@ -35,7 +35,7 @@ const ChatList = ({ navigation }) => {
                             navigation.navigate('Chat')
                         }}
                     >
-                        <Image style={styles.image} source={require("../assets/profil.png")} />
+                        <Image style={styles.image} source={{ uri: item.imageUrl }} />
                         <View>
                             <Text style={styles.name}>{item.name}</Text>
                             <View style={styles.info}>

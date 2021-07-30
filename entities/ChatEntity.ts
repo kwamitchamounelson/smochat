@@ -1,4 +1,4 @@
-export default class {
+export class ChatEntity {
     id = ''
     name = 'toto'
     imageUrl = ''
