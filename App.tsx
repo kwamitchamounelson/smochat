@@ -8,6 +8,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import ChatList from './views/ChatList';
 import Chat from './views/Chat';
+import OnBoarding from './views/OnBoarding';
 
 
 const Stack = createStackNavigator();
@@ -16,6 +17,13 @@ export default function App() {
   return (
     <NavigationContainer>
       <Stack.Navigator>
+
+        <Stack.Screen
+          name="OnBoarding"
+          component={OnBoarding}
+          options={{ title: ' ' }}
+        />
+
         <Stack.Screen
           name="Login"
           component={Login}

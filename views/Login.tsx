@@ -1,4 +1,5 @@
-import React, { useState, useRef } from "react";
+import { FirebaseAuthApplicationVerifier, FirebaseRecaptchaVerifierModal } from "expo-firebase-recaptcha";
+import React, { useState, useRef, useEffect } from "react";
 import {
     SafeAreaView,
     Image,
@@ -10,21 +11,63 @@ import {
     Text,
 } from "react-native";
 import PhoneInput from "react-native-phone-number-input";
-import { color } from "react-native-reanimated";
+import { firebase } from "../firebase/config2";
+
+const firebaseInstance = firebase.default;
+
+
 
 const Login: React.FC = ({ navigation }) => {
     const [value, setValue] = useState("");
     const [formattedValue, setFormattedValue] = useState("");
     const [code, setCode] = useState("");
     const [showError, setShowError] = useState(false);
+    const [verificationId, setVerificationId] = useState<string>("");
     const phoneInput = useRef<PhoneInput>(null);
 
     const [validation, setValidation] = useState(false);
 
+    const recaptchaVerifier = useRef<any>(null);
+
+    // Function to be called when requesting for a verification code
+    const sendVerification = () => {
+        const phoneProvider = new firebaseInstance.auth.PhoneAuthProvider();
+        phoneProvider
+            .verifyPhoneNumber(formattedValue, recaptchaVerifier.current)
+            .then((data) => {
+                console.log('**************** Verification code sended !******************');
+                console.log(data);
+                setVerificationId(data)
+                setValidation(true);
+            }).catch((error) => {
+                console.log('**************** Error when sending verification code ******************');
+                console.log(error);
+            });
+    };
+
+    // Function to be called when confirming the verification code that we received
+    // from Firebase via SMS
+    const confirmCode = () => {
+        const credential = firebaseInstance.auth.PhoneAuthProvider.credential(
+            verificationId,
+            code
+        );
+        firebaseInstance
+            .auth()
+            .signInWithCredential(credential)
+            .then((result) => {
+                console.log('**************** Connection success !******************');
+                navigation.navigate('Profile');
+            }).catch((error) => {
+                console.log('**************** Connection failed ******************');
+                console.log(error);
+            });
+    }
+
     return (
         <>
             <View style={styles.container}>
-                <Image style={styles.image} source={require("../assets/logo.png")} />
+                <Text style={styles.textIndicator}>{validation ? 'Enter received code' : 'Enter your phone number'}</Text>
 
                 <View
                     style={[{ display: validation ? 'none' : 'flex' }, { marginBottom: 40 }]}
@@ -41,7 +84,6 @@ const Login: React.FC = ({ navigation }) => {
                         }}
                         onChangeFormattedText={(text) => {
                             setFormattedValue(text);
-                            console.log(text)
                         }}
                         withDarkTheme
                         withShadow
@@ -70,19 +112,22 @@ const Login: React.FC = ({ navigation }) => {
                         if (!validation) {
                             const checkValid = phoneInput.current?.isValidNumber(value) || false;
                             if (checkValid) {
-                                //TODO call server with user phone number
+                                //call server with user phone number
+                                sendVerification();
                             }
-                            setValidation(checkValid);
                             setShowError(!checkValid);
                         } else {
-                            //TODO virify entered code
-                            navigation.navigate('Profile')
+                            //virify entered code
+                            confirmCode();
                         }
                     }}>
                     <Text style={[{ color: 'white' }]}>{validation ? 'Verify' : 'Next'}</Text>
                 </TouchableOpacity>
-
             </View>
+            <FirebaseRecaptchaVerifierModal
+                ref={recaptchaVerifier}
+                firebaseConfig={firebaseInstance.app().options}
+            />
         </>
     );
 };
@@ -96,10 +141,12 @@ const styles = StyleSheet.create({
         justifyContent: "center",
     },
 
-    image: {
-        marginBottom: 90,
-        width: 100,
-        height: 100
+    textIndicator: {
+        marginBottom: 70,
+        fontSize: 24,
+        color: "#2f99af",
+        textAlign: "center",
+        fontWeight: "bold",
     },
 
     inputView: {
