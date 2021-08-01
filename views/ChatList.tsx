@@ -1,29 +1,45 @@
 import { useFocusEffect } from '@react-navigation/native';
 import React, { useEffect, useState } from 'react';
 import { BackHandler, FlatList, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { ChatEntity } from '../entities/ChatEntity';
+import { UserEntity } from '../entities/UserEntity';
+
+import { firebase } from "../firebase/config2";
+
+const firebaseInstance = firebase.default;
+
+const currentUserPhoneNumber = firebaseInstance.auth().currentUser?.phoneNumber;
 
 const ChatList = ({ navigation }) => {
-    const [chats, setChats] = useState<ChatEntity[]>([]);
+    const [users, setUsers] = useState<UserEntity[]>([]);
 
-    const getChats = async () => {
-        // generation of elments to build list of items
-        const range = Array.from(Array(20).keys());
-        const datas: ChatEntity[] = range.map((value) => {
-            return new ChatEntity("" + value, 'toto ' + value, 'https://randomuser.me/api/portraits/women/' + value + '.jpg')
-        })
-
-        setChats(datas)
+    const getUsers = () => {
+        console.log("************* Current user phoneNumber *******************");
+        console.log(currentUserPhoneNumber);
+        let user: UserEntity;
+        firebaseInstance
+            .firestore()
+            .collection('USERS')
+            .where('phoneNumber', '!=', currentUserPhoneNumber)
+            .onSnapshot((querySnapshot) => {
+                const datas = querySnapshot.docs.map(e => {
+                    user = e.data() as UserEntity;
+                    user.id = e.id;
+                    return user;
+                });
+                console.log("************* list of users *******************");
+                console.log(datas);
+                setUsers(datas);
+            });
     };
 
     useEffect(() => {
-        getChats()
+        getUsers();
     }, []);
 
     useFocusEffect(
         React.useCallback(() => {
             const onBackPress = () => {
-                console.log('************** back pressed ******************')
+                console.log('************** back pressed ******************');
                 BackHandler.exitApp();
                 return true;
             };
@@ -39,7 +55,7 @@ const ChatList = ({ navigation }) => {
     return (
         <View style={styles.container}>
             <FlatList
-                data={chats}
+                data={users}
 
 
                 keyExtractor={({ id }) => id}
@@ -47,7 +63,7 @@ const ChatList = ({ navigation }) => {
                 renderItem={({ item }) =>
                     <TouchableOpacity style={styles.item}
                         onPress={() => {
-                            navigation.navigate('Chat')
+                            navigation.navigate('Chat', { user: item });
                         }}
                     >
                         <Image style={styles.image} source={{ uri: item.imageUrl }} />

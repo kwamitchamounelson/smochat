@@ -1,11 +1,13 @@
+import { MessageEntity } from "./MessageEntity";
+
 export class ChatEntity {
     id = ''
-    name = 'toto'
-    imageUrl = ''
+    members: string[] = []
+    lastMessage: MessageEntity | null = new MessageEntity('', '', '', '', new Date());
 
-    constructor(id: string, name: string, imageUrl: string) {
+    constructor(id: string, members: string[], lastMessage: MessageEntity | null) {
         this.id = id;
-        this.name = name;
-        this.imageUrl = imageUrl;
+        this.members = members;
+        this.lastMessage = lastMessage;
     }
 }
