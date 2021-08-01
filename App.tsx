@@ -7,6 +7,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import ChatList from './views/ChatList';
 import Chat from './views/Chat';
 import OnBoarding from './views/OnBoarding';
+import CustomMaterialMenu from './components/CustomMaterialMenu';
 
 
 const Stack = createStackNavigator();
@@ -15,12 +16,26 @@ export default function App() {
   return (
     <NavigationContainer>
       <Stack.Navigator
-        screenOptions={{
+        initialRouteName="OnBoarding"
+        screenOptions={({ route, navigation }) => ({
           headerStyle: {
             backgroundColor: '#2f99af',
           },
           headerTintColor: '#fff',
-        }}
+          headerRight: () => (
+            <CustomMaterialMenu
+              //Menu Text
+              menutext="Menu"
+              //Menu View Style
+              menustyle={{ marginRight: 10 }}
+              //Menu Text Style
+              textStyle={{ color: 'white' }}
+              navigation={navigation}
+              route={route}
+              isIcon={true}
+            />
+          ),
+        })}
       >
 
         <Stack.Screen

@@ -1,3 +1,4 @@
+import { useFocusEffect } from "@react-navigation/native";
 import { FirebaseRecaptchaVerifierModal } from "expo-firebase-recaptcha";
 import React, { useState, useRef } from "react";
 import {
@@ -6,6 +7,7 @@ import {
     View,
     TouchableOpacity,
     Text,
+    BackHandler,
 } from "react-native";
 import PhoneInput from "react-native-phone-number-input";
 import { firebase } from "../firebase/config2";
@@ -59,7 +61,22 @@ const Login: React.FC = ({ navigation }) => {
                 console.log('**************** Connection failed ******************');
                 console.log(error);
             });
-    }
+    };
+
+    useFocusEffect(
+        React.useCallback(() => {
+            const onBackPress = () => {
+                console.log('************** back pressed ******************')
+                BackHandler.exitApp();
+                return true;
+            };
+
+            BackHandler.addEventListener('hardwareBackPress', onBackPress);
+
+            return () =>
+                BackHandler.removeEventListener('hardwareBackPress', onBackPress);
+        }, [])
+    );
 
     return (
         <>
