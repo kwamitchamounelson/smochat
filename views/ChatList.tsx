@@ -1,6 +1,6 @@
-import { StatusBar } from 'expo-status-bar';
+import { useFocusEffect } from '@react-navigation/native';
 import React, { useEffect, useState } from 'react';
-import { FlatList, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { BackHandler, FlatList, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { ChatEntity } from '../entities/ChatEntity';
 
 const ChatList = ({ navigation }) => {
@@ -19,6 +19,21 @@ const ChatList = ({ navigation }) => {
     useEffect(() => {
         getChats()
     }, []);
+
+    useFocusEffect(
+        React.useCallback(() => {
+            const onBackPress = () => {
+                console.log('************** back pressed ******************')
+                BackHandler.exitApp();
+                return true;
+            };
+
+            BackHandler.addEventListener('hardwareBackPress', onBackPress);
+
+            return () =>
+                BackHandler.removeEventListener('hardwareBackPress', onBackPress);
+        }, [])
+    );
 
 
     return (

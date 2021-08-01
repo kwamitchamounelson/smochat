@@ -1,7 +1,5 @@
 import 'react-native-gesture-handler';
-import { StatusBar } from 'expo-status-bar';
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
 import Login from './views/Login';
 import Profile from './views/Profile';
 import { NavigationContainer } from '@react-navigation/native';
@@ -16,28 +14,35 @@ const Stack = createStackNavigator();
 export default function App() {
   return (
     <NavigationContainer>
-      <Stack.Navigator>
+      <Stack.Navigator
+        screenOptions={{
+          headerStyle: {
+            backgroundColor: '#2f99af',
+          },
+          headerTintColor: '#fff',
+        }}
+      >
 
         <Stack.Screen
           name="OnBoarding"
           component={OnBoarding}
-          options={{ title: ' ' }}
+          options={{ headerShown: false }}
         />
 
         <Stack.Screen
           name="Login"
           component={Login}
-          options={{ title: 'Smochat' }}
+          options={{ headerShown: false, headerLeft: () => null }}
         />
 
         <Stack.Screen name="Profile"
           component={Profile}
-          options={{ title: 'Profile' }}
+          options={{ title: 'Profile', headerLeft: () => null }}
         />
 
         <Stack.Screen name="ChatList"
           component={ChatList}
-          options={{ title: 'ChatList' }}
+          options={{ title: 'Smochat', headerLeft: () => null }}
         />
 
         <Stack.Screen name="Chat"

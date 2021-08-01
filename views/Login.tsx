@@ -1,12 +1,9 @@
-import { FirebaseAuthApplicationVerifier, FirebaseRecaptchaVerifierModal } from "expo-firebase-recaptcha";
-import React, { useState, useRef, useEffect } from "react";
+import { FirebaseRecaptchaVerifierModal } from "expo-firebase-recaptcha";
+import React, { useState, useRef } from "react";
 import {
-    SafeAreaView,
-    Image,
     TextInput,
     StyleSheet,
     View,
-    StatusBar,
     TouchableOpacity,
     Text,
 } from "react-native";
