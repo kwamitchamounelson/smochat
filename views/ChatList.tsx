@@ -96,7 +96,7 @@ const ChatList = ({ navigation }) => {
                         <View>
                             <Text style={styles.name}>{item.name}</Text>
                             <View style={styles.info}>
-                                <Text style={styles.lastMessage} numberOfLines={1}>Bonjour a toi</Text>
+                                <Text style={styles.lastMessage} numberOfLines={1}>{item.phoneNumber}</Text>
                                 <Text style={styles.date}>20 Mai</Text>
                             </View>
                         </View>
