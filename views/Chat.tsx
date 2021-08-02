@@ -34,7 +34,7 @@ const Chat = (props) => {
         firebaseInstance
             .firestore()
             .collection('CHATS')
-            .where('members', 'array-contains-any', [currentUserPhoneNumber, otherUser?.phoneNumber])
+            .where('membersFilter', 'array-contains', `${currentUserPhoneNumber || ''}${otherUser?.phoneNumber}`)
             .onSnapshot((querySnapshot) => {
                 // We check if this chatChannel exist
                 if (!querySnapshot.empty) {
@@ -50,7 +50,15 @@ const Chat = (props) => {
                 } else {
                     // TODO create chatChannel
                     console.log("************* There is not chatChannel with this user *******************");
-                    const newChatChannel = new ChatEntity('', [currentUserPhoneNumber || '', otherUser?.phoneNumber], null);
+
+                    const members = [currentUserPhoneNumber || '', otherUser?.phoneNumber];
+
+                    const membersFilter = [
+                        `${currentUserPhoneNumber || ''}${otherUser?.phoneNumber}`,
+                        `${otherUser?.phoneNumber}${currentUserPhoneNumber || ''}`
+                    ];
+
+                    const newChatChannel = new ChatEntity('', members, membersFilter, null);
                     createChat(newChatChannel);
                 }
             });
