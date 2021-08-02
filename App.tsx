@@ -52,7 +52,7 @@ export default function App() {
 
         <Stack.Screen name="Profile"
           component={Profile}
-          options={{ title: 'Profile', headerLeft: () => null }}
+          options={{ title: 'Profile' }}
         />
 
         <Stack.Screen name="ChatList"

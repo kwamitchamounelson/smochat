@@ -27,7 +27,6 @@ const OnBoarding: React.FC = ({ navigation }) => {
     };
 
     useEffect(() => {
-        //firebaseInstance.auth().signOut();
         checkUser()
     }, []);
 

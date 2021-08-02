@@ -3,9 +3,9 @@ export class MessageEntity {
     senderId = ''
     receiverId = ''
     message = ''
-    date = new Date()
+    date: any = new Date()
 
-    constructor(id: string, senderId: string, receiverId: string, message: string, date: Date) {
+    constructor(id: string, senderId: string, receiverId: string, message: string, date: any) {
         this.id = id;
         this.senderId = senderId;
         this.receiverId = receiverId;

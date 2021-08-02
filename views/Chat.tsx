@@ -11,11 +11,12 @@ import { firebase } from "../firebase/config2";
 
 const firebaseInstance = firebase.default;
 
-const currentUserPhoneNumber = firebaseInstance.auth().currentUser?.phoneNumber;
+//const currentUserPhoneNumber = firebaseInstance.auth().currentUser?.phoneNumber;
 
 const Chat = (props) => {
 
     const [messages, setMessages] = useState<MessageEntity[]>([]);
+    const [currentUserPhoneNumber, setCurrentUserPhoneNumber] = useState(firebaseInstance.auth().currentUser?.phoneNumber);
 
     const [chat, setChat] = useState<ChatEntity>();
     const [user, setUser] = useState<any>();
@@ -45,7 +46,7 @@ const Chat = (props) => {
                     setChat(data);
 
                     // Now we have to get messages betwen those two users
-                    getMessages();
+                    getMessages(data);
                 } else {
                     // TODO create chatChannel
                     console.log("************* There is not chatChannel with this user *******************");
@@ -72,9 +73,8 @@ const Chat = (props) => {
     }
 
 
-    const sendMessage = () => {
-        console.log("************* Sendeding message *******************");
-        let message = new MessageEntity('', currentUserPhoneNumber || '', user.phoneNumber, text, new Date());
+    const sendMessage = (message: MessageEntity) => {
+        console.log("************* Sendeding message in chatChannel : " + chat?.id + " *******************");
         firebaseInstance
             .firestore()
             .collection('CHATS')
@@ -94,13 +94,15 @@ const Chat = (props) => {
 
 
     // moke data
-    const getMessages = () => {
+    const getMessages = (chatChannel: ChatEntity) => {
+        console.log("************* Getting messages from : " + chatChannel.id + " channel *******************");
         let element: MessageEntity;
         firebaseInstance
             .firestore()
             .collection('CHATS')
-            .doc(chat?.id)
+            .doc(chatChannel.id)
             .collection('MESSAGES')
+            .orderBy('date', 'asc')
             .onSnapshot((querySnapshot) => {
                 const datas = querySnapshot.docs.map(e => {
                     element = e.data() as MessageEntity;
@@ -111,16 +113,27 @@ const Chat = (props) => {
                 console.log(datas);
                 setMessages(datas);
             });
-    }
+    };
+
+    //temporary
+    const checkUser = () => {
+        firebaseInstance.auth().onAuthStateChanged(user => {
+            if (user != null) {
+                setCurrentUserPhoneNumber(user.phoneNumber);
+                getChatChannel();
+            }
+        });
+    };
 
     useEffect(() => {
-        getChatChannel();
+        checkUser();
     }, []);
 
     return (
         <View style={styles.container}>
             <FlatList
                 showsVerticalScrollIndicator={false}
+                scrollsToTop={true}
                 style={styles.chatContainer}
                 data={messages}
                 keyExtractor={({ id }) => id}
@@ -133,7 +146,7 @@ const Chat = (props) => {
                             ]}>
                             <View>
                                 <Text style={[styles.message, { color: (item.senderId === currentUserPhoneNumber) ? 'white' : 'black' }]}>{item.message}</Text>
-                                <Text style={[styles.date]}>{item.date.toLocaleString()}</Text>
+                                <Text style={[styles.date]}>{new Date((item.date.nanoseconds * 1000)).toLocaleString()}</Text>
                             </View>
                         </TouchableOpacity>
                     </View>
@@ -145,14 +158,24 @@ const Chat = (props) => {
                     placeholder="Enter message"
                     placeholderTextColor="grey"
                     multiline={true}
-                    onChangeText={(text) => setText(text)}
+                    onChangeText={(text) => {
+                        setText(text);
+                    }}
+                    value={text}
                 />
                 <TouchableOpacity
                     style={[{ display: (text.length !== 0) ? 'flex' : 'none' }]}
                     onPress={() => {
                         if (text.length !== 0) {
-                            sendMessage();
+                            let messageText = text;
+                            let message = new MessageEntity('', currentUserPhoneNumber || '', user.phoneNumber, messageText, new Date());
+                            sendMessage(message);
+
+                            // to remove, only for testing
+                            let message2 = new MessageEntity('', user.phoneNumber, currentUserPhoneNumber || '', 'Ce matin ce matin ok ca vas bien et toi test hooo tes cemation', new Date());
+                            sendMessage(message2);
                         }
+                        setText('');
                     }}
                 >
                     <Image style={styles.image} source={require("../assets/send.png")} />

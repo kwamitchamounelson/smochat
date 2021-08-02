@@ -1,23 +1,8 @@
-import { useFocusEffect } from '@react-navigation/native';
 import React, { useState } from 'react';
-import { BackHandler, Image, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Image, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
 const Profile = ({ navigation }) => {
     const [name, setName] = useState("");
-    useFocusEffect(
-        React.useCallback(() => {
-            const onBackPress = () => {
-                console.log('************** back pressed ******************')
-                BackHandler.exitApp();
-                return true;
-            };
-
-            BackHandler.addEventListener('hardwareBackPress', onBackPress);
-
-            return () =>
-                BackHandler.removeEventListener('hardwareBackPress', onBackPress);
-        }, [])
-    );
     return (
         <View style={styles.container}>
             <Image style={styles.image} source={require("../assets/profil.png")} />

@@ -58,9 +58,10 @@ const CustomMaterialMenu = (props) => {
                 ) : null} */}
                 <MenuItem
                     onPress={() => {
+                        props.navigation.navigate('Profile');
                         _menu.hide();
                     }}>
-                    Action 1
+                    Profil
                 </MenuItem>
                 <MenuDivider />
                 <MenuItem

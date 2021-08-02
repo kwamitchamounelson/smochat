@@ -1,16 +1,19 @@
 import { useFocusEffect } from '@react-navigation/native';
 import React, { useEffect, useState } from 'react';
 import { BackHandler, FlatList, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import * as Progress from 'react-native-progress';
 import { UserEntity } from '../entities/UserEntity';
 
 import { firebase } from "../firebase/config2";
 
 const firebaseInstance = firebase.default;
 
-const currentUserPhoneNumber = firebaseInstance.auth().currentUser?.phoneNumber;
+//const currentUserPhoneNumber = firebaseInstance.auth().currentUser?.phoneNumber;
 
 const ChatList = ({ navigation }) => {
     const [users, setUsers] = useState<UserEntity[]>([]);
+    const [progress, setProgress] = useState(true);
+    const [currentUserPhoneNumber, setCurrentUserPhoneNumber] = useState(firebaseInstance.auth().currentUser?.phoneNumber);
 
     const getUsers = () => {
         console.log("************* Current user phoneNumber *******************");
@@ -28,12 +31,23 @@ const ChatList = ({ navigation }) => {
                 });
                 console.log("************* list of users *******************");
                 console.log(datas);
+                setProgress(false);
                 setUsers(datas);
             });
     };
 
+    //temporary
+    const checkUser = () => {
+        firebaseInstance.auth().onAuthStateChanged(user => {
+            if (user != null) {
+                setCurrentUserPhoneNumber(user.phoneNumber);
+                getUsers();
+            }
+        });
+    };
+
     useEffect(() => {
-        getUsers();
+        checkUser();
     }, []);
 
     useFocusEffect(
@@ -54,9 +68,17 @@ const ChatList = ({ navigation }) => {
 
     return (
         <View style={styles.container}>
+
+            <Progress.Circle
+                style={[styles.progressView, { display: progress ? 'flex' : 'none' }]}
+                size={40}
+                indeterminate={true}
+            />
+
             <FlatList
                 data={users}
 
+                style={[{ display: progress ? 'none' : 'flex' }]}
 
                 keyExtractor={({ id }) => id}
 
@@ -116,6 +138,11 @@ const styles = StyleSheet.create({
     },
     date: {
         width: "20%"
+    },
+    progressView: {
+        alignItems: "center",
+        justifyContent: "center",
+        marginTop: 60
     }
 });
 

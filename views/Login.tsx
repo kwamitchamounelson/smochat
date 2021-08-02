@@ -10,9 +10,14 @@ import {
     BackHandler,
 } from "react-native";
 import PhoneInput from "react-native-phone-number-input";
+import { UserEntity } from "../entities/UserEntity";
 import { firebase } from "../firebase/config2";
 
 const firebaseInstance = firebase.default;
+
+const invalidPhoneText = 'Invalid phone number';
+
+const invalidCodeText = 'Invalid code';
 
 
 
@@ -20,7 +25,7 @@ const Login: React.FC = ({ navigation }) => {
     const [value, setValue] = useState("");
     const [formattedValue, setFormattedValue] = useState("");
     const [code, setCode] = useState("");
-    const [showError, setShowError] = useState(false);
+    const [textError, setTextError] = useState('');
     const [verificationId, setVerificationId] = useState<string>("");
     const phoneInput = useRef<PhoneInput>(null);
 
@@ -55,11 +60,44 @@ const Login: React.FC = ({ navigation }) => {
             .auth()
             .signInWithCredential(credential)
             .then((result) => {
-                console.log('**************** Connection success !******************');
-                navigation.navigate('Profile');
+                console.log('**************** Singin success !******************');
+                const userId = result.user?.uid || '';
+
+                firebaseInstance
+                    .firestore()
+                    .collection('USERS')
+                    .doc(userId)
+                    .get()
+                    .then((doc) => {
+                        if (!doc.exists) {
+                            console.log('**************** User datas dont exist, we try to create his datas ******************');
+                            const user = new UserEntity(result.user?.uid || '', result.user?.phoneNumber || '', '', '');
+                            firebaseInstance
+                                .firestore()
+                                .collection('USERS')
+                                .doc(user.id)
+                                .set({ ...user }, { merge: true })
+                                .then((res) => {
+                                    console.log('**************** New user created succefull ******************');
+                                    //navigation.navigate('Profile');
+                                })
+                                .catch((error) => {
+                                    console.log('**************** Error when creating new user ******************');
+                                    console.log(error);
+                                });
+                        } else {
+                            console.log('**************** User datas already exist ******************');
+                            //navigation.navigate('Profile');
+                        }
+                    })
+                    .catch((error) => {
+                        console.log('**************** Error when geting user datas ******************');
+                        console.log(error);
+                    });
             }).catch((error) => {
-                console.log('**************** Connection failed ******************');
+                console.log('**************** Singin failed ******************');
                 console.log(error);
+                setTextError(invalidCodeText);
             });
     };
 
@@ -81,7 +119,11 @@ const Login: React.FC = ({ navigation }) => {
     return (
         <>
             <View style={styles.container}>
-                <Text style={styles.textIndicator}>{validation ? 'Enter received code' : 'Enter your phone number'}</Text>
+
+                <View style={styles.title}>
+                    <Text style={styles.textIndicator}>{validation ? 'Enter received code' : 'Enter your phone number'}</Text>
+                    <Text style={[styles.error, { display: textError !== '' ? 'flex' : 'none' }]}>{textError}</Text>
+                </View>
 
                 <View
                     style={[{ display: validation ? 'none' : 'flex' }, { marginBottom: 40 }]}
@@ -94,7 +136,7 @@ const Login: React.FC = ({ navigation }) => {
                         layout="first"
                         onChangeText={(text) => {
                             setValue(text);
-                            setShowError(false);
+                            setTextError('');
                         }}
                         onChangeFormattedText={(text) => {
                             setFormattedValue(text);
@@ -103,7 +145,6 @@ const Login: React.FC = ({ navigation }) => {
                         withShadow
                         autoFocus
                     />
-                    <Text style={[styles.error, { display: showError ? 'flex' : 'none' }]}>Invalid phone number</Text>
                 </View>
 
 
@@ -113,7 +154,10 @@ const Login: React.FC = ({ navigation }) => {
                         placeholder="Enter code"
                         placeholderTextColor="#003f5c"
                         keyboardType={'number-pad'}
-                        onChangeText={(code) => setCode(code)}
+                        onChangeText={(code) => {
+                            setCode(code)
+                            setTextError('');
+                        }}
                     />
                 </View>
 
@@ -129,7 +173,8 @@ const Login: React.FC = ({ navigation }) => {
                                 //call server with user phone number
                                 sendVerification();
                             }
-                            setShowError(!checkValid);
+                            const info = checkValid ? '' : invalidPhoneText
+                            setTextError(info);
                         } else {
                             //virify entered code
                             confirmCode();
@@ -156,7 +201,7 @@ const styles = StyleSheet.create({
     },
 
     textIndicator: {
-        marginBottom: 70,
+        marginBottom: 15,
         fontSize: 24,
         color: "#2f99af",
         textAlign: "center",
@@ -170,7 +215,7 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         width: "70%",
         height: 45,
-        marginBottom: 20,
+        marginBottom: 40,
         alignItems: "center",
     },
 
@@ -186,12 +231,16 @@ const styles = StyleSheet.create({
         height: 50,
         alignItems: "center",
         justifyContent: "center",
-        marginTop: 40,
+        marginBottom: 40,
         backgroundColor: "#2f99af",
     },
     error: {
         color: "red",
-        marginTop: 10
+    },
+    title: {
+        marginBottom: 60,
+        alignItems: "center",
+        justifyContent: "center",
     }
 });
 
