@@ -11,6 +11,7 @@ import { firebase } from "../firebase/config2";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import * as Progress from 'react-native-progress';
+import ChatProfile from '../components/ChatProfile';
 
 
 const firebaseInstance = firebase.default;
@@ -33,6 +34,7 @@ const Chat = (props) => {
         console.log("************* Other user *******************");
         console.log(otherUser);
         setUser(otherUser);
+        props.navigation.setOptions({ headerTitle: () => <ChatProfile userData={otherUser} /> });
 
         firebaseInstance
             .firestore()
@@ -174,7 +176,7 @@ const Chat = (props) => {
                     </View>
                 }
             />
-            <View style={styles.inputBlock}>
+            <View style={[styles.inputBlock, { display: progress ? 'none' : 'flex' }]}>
                 <TextInput
                     style={styles.textInput}
                     placeholder="Enter message"
