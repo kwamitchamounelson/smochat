@@ -6,6 +6,8 @@ import {
     View,
 } from "react-native";
 import { firebase } from "../firebase/config2";
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 
 const firebaseInstance = firebase.default;
 
@@ -13,11 +15,23 @@ const firebaseInstance = firebase.default;
 
 const OnBoarding: React.FC = ({ navigation }) => {
 
+    const storeUserPhone = async (phone: string) => {
+        try {
+            await AsyncStorage.setItem(
+                'currentUserPhoneNumber',
+                phone
+            );
+        } catch (error) {
+            // Error saving data
+        }
+    };
+
     const checkUser = () => {
         firebaseInstance.auth().onAuthStateChanged(user => {
             if (user != null) {
                 console.log('****************Connected!******************');
                 console.log(user.phoneNumber);
+                storeUserPhone(user.phoneNumber || '');
                 navigation.navigate('ChatList');
             } else {
                 console.log('****************Disconnected!******************');

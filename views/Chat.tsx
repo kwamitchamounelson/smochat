@@ -8,10 +8,12 @@ import { MessageEntity } from '../entities/MessageEntity';
 import { UserEntity } from '../entities/UserEntity';
 
 import { firebase } from "../firebase/config2";
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+import * as Progress from 'react-native-progress';
+
 
 const firebaseInstance = firebase.default;
-
-//const currentUserPhoneNumber = firebaseInstance.auth().currentUser?.phoneNumber;
 
 const Chat = (props) => {
 
@@ -21,6 +23,7 @@ const Chat = (props) => {
     const [chat, setChat] = useState<ChatEntity>();
     const [user, setUser] = useState<any>();
     const [text, setText] = useState('');
+    const [progress, setProgress] = useState(true);
 
     const getChatChannel = () => {
         console.log("************* Current User PhoneNumber *******************");
@@ -119,26 +122,37 @@ const Chat = (props) => {
                 });
                 console.log("************* list of messages *******************");
                 console.log(datas);
+                setProgress(false);
                 setMessages(datas);
             });
     };
 
-    //temporary
-    const checkUser = () => {
-        firebaseInstance.auth().onAuthStateChanged(user => {
-            if (user != null) {
-                setCurrentUserPhoneNumber(user.phoneNumber);
+    const loadData = async () => {
+        try {
+            const phone = await AsyncStorage.getItem('currentUserPhoneNumber');
+            console.log("************* Current user phoneNumber from AsyncStorage : " + phone + "  *******************");
+            if (phone !== null) {
+                setCurrentUserPhoneNumber(phone);
                 getChatChannel();
             }
-        });
+        } catch (error) {
+            console.log("************* Error when getting user phone from AsyncStorage *******************");
+            console.log(error);
+        }
     };
 
     useEffect(() => {
-        checkUser();
+        loadData();
     }, []);
 
     return (
         <View style={styles.container}>
+            <Progress.Circle
+                style={[styles.progressView, { display: progress ? 'flex' : 'none' }]}
+                size={60}
+                color="#2f99af"
+                indeterminate={true}
+            />
             <FlatList
                 showsVerticalScrollIndicator={false}
                 scrollsToTop={true}
@@ -235,6 +249,11 @@ const styles = StyleSheet.create({
         width: 30,
         height: 30,
         marginEnd: 10
+    },
+    progressView: {
+        alignItems: "center",
+        justifyContent: "center",
+        marginTop: 60
     }
 });
 

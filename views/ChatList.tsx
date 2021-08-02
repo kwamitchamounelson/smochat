@@ -6,9 +6,9 @@ import { UserEntity } from '../entities/UserEntity';
 
 import { firebase } from "../firebase/config2";
 
-const firebaseInstance = firebase.default;
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-//const currentUserPhoneNumber = firebaseInstance.auth().currentUser?.phoneNumber;
+const firebaseInstance = firebase.default;
 
 const ChatList = ({ navigation }) => {
     const [users, setUsers] = useState<UserEntity[]>([]);
@@ -36,18 +36,22 @@ const ChatList = ({ navigation }) => {
             });
     };
 
-    //temporary
-    const checkUser = () => {
-        firebaseInstance.auth().onAuthStateChanged(user => {
-            if (user != null) {
-                setCurrentUserPhoneNumber(user.phoneNumber);
+    const loadData = async () => {
+        try {
+            const phone = await AsyncStorage.getItem('currentUserPhoneNumber');
+            console.log("************* Current user phoneNumber from AsyncStorage : " + phone + "  *******************");
+            if (phone !== null) {
+                setCurrentUserPhoneNumber(phone);
                 getUsers();
             }
-        });
+        } catch (error) {
+            console.log("************* Error when getting user phone from AsyncStorage *******************");
+            console.log(error);
+        }
     };
 
     useEffect(() => {
-        checkUser();
+        loadData();
     }, []);
 
     useFocusEffect(
