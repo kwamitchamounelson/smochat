@@ -23,7 +23,7 @@ const invalidCodeText = 'Invalid code';
 
 
 
-const Login: React.FC = ({ navigation }) => {
+const Login: React.FC = () => {
     const [value, setValue] = useState("");
     const [formattedValue, setFormattedValue] = useState("");
     const [code, setCode] = useState("");

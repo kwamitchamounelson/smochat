@@ -97,7 +97,6 @@ const Chat = (props) => {
     }
 
 
-    // moke data
     const getMessages = (chatChannel: ChatEntity) => {
         console.log("************* Getting messages from : " + chatChannel.id + " channel *******************");
         let element: MessageEntity;
