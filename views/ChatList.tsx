@@ -92,7 +92,7 @@ const ChatList = ({ navigation }) => {
                             navigation.navigate('Chat', { user: item });
                         }}
                     >
-                        <Image style={styles.image} source={{ uri: item.imageUrl }} />
+                        <Image style={styles.image} source={item.imageUrl == '' ? (require("../assets/profil.png")) : { uri: item.imageUrl }} />
                         <View>
                             <Text style={styles.name}>{item.name}</Text>
                             <View style={styles.info}>

@@ -228,7 +228,8 @@ const styles = StyleSheet.create({
         marginBottom: 15,
     },
     message: {
-        marginBottom: 5
+        marginBottom: 5,
+        fontSize: 16
     },
     date: {
         color: 'lightsteelblue',

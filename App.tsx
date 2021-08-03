@@ -8,6 +8,7 @@ import ChatList from './views/ChatList';
 import Chat from './views/Chat';
 import OnBoarding from './views/OnBoarding';
 import CustomMaterialMenu from './components/CustomMaterialMenu';
+import TakeCamera from './components/TakeCamera';
 
 
 const Stack = createStackNavigator();
@@ -63,6 +64,11 @@ export default function App() {
         <Stack.Screen name="Chat"
           component={Chat}
           options={{ title: ' ' }}
+        />
+
+        <Stack.Screen name="TakePhoto"
+          component={TakeCamera}
+          options={{ headerShown: false }}
         />
       </Stack.Navigator>
     </NavigationContainer>
