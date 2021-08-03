@@ -27,6 +27,8 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "description": "Demo for react native learning",
+    "githubUrl": "https://github.com/kwamitchamounelson/smochat.git"
   }
 }
