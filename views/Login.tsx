@@ -89,6 +89,8 @@ const Login: React.FC = ({ navigation }) => {
                                     .set({ ...user }, { merge: true })
                                     .then((res) => {
                                         console.log('**************** New user created succefull ******************');
+                                        setProgress(false);
+                                        setValidation(false);
                                         //navigation.navigate('Profile');
                                     })
                                     .catch((error) => {
@@ -98,6 +100,8 @@ const Login: React.FC = ({ navigation }) => {
                             } else {
                                 console.log('**************** User datas already exist ******************');
                                 //navigation.navigate('Profile');
+                                setProgress(false);
+                                setValidation(false);
                             }
                         })
                         .catch((error) => {
