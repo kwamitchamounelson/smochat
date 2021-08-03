@@ -170,7 +170,7 @@ const Chat = (props) => {
                             ]}>
                             <View>
                                 <Text style={[styles.message, { color: (item.senderId === currentUserPhoneNumber) ? 'white' : 'black' }]}>{item.message}</Text>
-                                <Text style={[styles.date]}>{new Date((item.date.nanoseconds * 1000)).toLocaleString()}</Text>
+                                <Text style={[styles.date]}>{new Date((item.date.seconds * 1000)).toLocaleString()}</Text>
                             </View>
                         </TouchableOpacity>
                     </View>
@@ -196,8 +196,8 @@ const Chat = (props) => {
                             sendMessage(message);
 
                             // to remove, only for testing
-                            let message2 = new MessageEntity('', user.phoneNumber, currentUserPhoneNumber || '', 'Ce matin ce matin ok ca vas bien et toi test hooo tes cemation', new Date());
-                            sendMessage(message2);
+                            /* let message2 = new MessageEntity('', user.phoneNumber, currentUserPhoneNumber || '', 'Ce matin ce matin ok ca vas bien et toi test hooo tes cemation', new Date());
+                            sendMessage(message2); */
                         }
                         setText('');
                     }}
@@ -246,7 +246,8 @@ const styles = StyleSheet.create({
     textInput: {
         flex: 1,
         padding: 10,
-        fontSize: 18
+        fontSize: 18,
+        marginLeft: 10
     },
     image: {
         width: 30,

@@ -7,7 +7,7 @@ const ChatProfile = (props) => {
         <View style={styles.container}>
             <Image
                 style={styles.image}
-                source={{ uri: user.imageUrl }}
+                source={user?.imageUrl == '' ? (require("../assets/profil.png")) : { uri: user?.imageUrl }}
             />
             <View style={styles.info}>
                 <Text style={styles.name}>{user.name}</Text>

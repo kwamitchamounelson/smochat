@@ -12,6 +12,8 @@ import {
 import PhoneInput from "react-native-phone-number-input";
 import { UserEntity } from "../entities/UserEntity";
 import { firebase } from "../firebase/config2";
+import * as Progress from 'react-native-progress';
+
 
 const firebaseInstance = firebase.default;
 
@@ -28,6 +30,7 @@ const Login: React.FC = ({ navigation }) => {
     const [textError, setTextError] = useState('');
     const [verificationId, setVerificationId] = useState<string>("");
     const phoneInput = useRef<PhoneInput>(null);
+    const [progress, setProgress] = useState(false);
 
     const [validation, setValidation] = useState(false);
 
@@ -35,70 +38,79 @@ const Login: React.FC = ({ navigation }) => {
 
     // Function to be called when requesting for a verification code
     const sendVerification = () => {
-        const phoneProvider = new firebaseInstance.auth.PhoneAuthProvider();
-        phoneProvider
-            .verifyPhoneNumber(formattedValue, recaptchaVerifier.current)
-            .then((data) => {
-                console.log('**************** Verification code sended !******************');
-                console.log(data);
-                setVerificationId(data)
-                setValidation(true);
-            }).catch((error) => {
-                console.log('**************** Error when sending verification code ******************');
-                console.log(error);
-            });
+        if (!progress) {
+            setProgress(true);
+            const phoneProvider = new firebaseInstance.auth.PhoneAuthProvider();
+            phoneProvider
+                .verifyPhoneNumber(formattedValue, recaptchaVerifier.current)
+                .then((data) => {
+                    console.log('**************** Verification code sended !******************');
+                    console.log(data);
+                    setVerificationId(data)
+                    setValidation(true);
+                    setProgress(false);
+                }).catch((error) => {
+                    console.log('**************** Error when sending verification code ******************');
+                    console.log(error);
+                    setProgress(false);
+                });
+        }
     };
 
     // Function to be called when confirming the verification code that we received
     // from Firebase via SMS
     const confirmCode = () => {
-        const credential = firebaseInstance.auth.PhoneAuthProvider.credential(
-            verificationId,
-            code
-        );
-        firebaseInstance
-            .auth()
-            .signInWithCredential(credential)
-            .then((result) => {
-                console.log('**************** Singin success !******************');
-                const userId = result.user?.uid || '';
+        if (!progress) {
+            setProgress(true);
+            const credential = firebaseInstance.auth.PhoneAuthProvider.credential(
+                verificationId,
+                code
+            );
+            firebaseInstance
+                .auth()
+                .signInWithCredential(credential)
+                .then((result) => {
+                    console.log('**************** Singin success !******************');
+                    const userId = result.user?.uid || '';
 
-                firebaseInstance
-                    .firestore()
-                    .collection('USERS')
-                    .doc(userId)
-                    .get()
-                    .then((doc) => {
-                        if (!doc.exists) {
-                            console.log('**************** User datas dont exist, we try to create his datas ******************');
-                            const user = new UserEntity(result.user?.uid || '', result.user?.phoneNumber || '', '', '');
-                            firebaseInstance
-                                .firestore()
-                                .collection('USERS')
-                                .doc(user.id)
-                                .set({ ...user }, { merge: true })
-                                .then((res) => {
-                                    console.log('**************** New user created succefull ******************');
-                                    //navigation.navigate('Profile');
-                                })
-                                .catch((error) => {
-                                    console.log('**************** Error when creating new user ******************');
-                                    console.log(error);
-                                });
-                        } else {
-                            console.log('**************** User datas already exist ******************');
-                            //navigation.navigate('Profile');
-                        }
-                    })
-                    .catch((error) => {
-                        console.log('**************** Error when geting user datas ******************');
-                        console.log(error);
-                    });
-            }).catch((error) => {
-                console.log('**************** Singin failed ******************');
-                console.log(error);
-                setTextError(invalidCodeText);
-            });
+                    firebaseInstance
+                        .firestore()
+                        .collection('USERS')
+                        .doc(userId)
+                        .get()
+                        .then((doc) => {
+                            if (!doc.exists) {
+                                console.log('**************** User datas dont exist, we try to create his datas ******************');
+                                const user = new UserEntity(result.user?.uid || '', result.user?.phoneNumber || '', '', '');
+                                firebaseInstance
+                                    .firestore()
+                                    .collection('USERS')
+                                    .doc(user.id)
+                                    .set({ ...user }, { merge: true })
+                                    .then((res) => {
+                                        console.log('**************** New user created succefull ******************');
+                                        //navigation.navigate('Profile');
+                                    })
+                                    .catch((error) => {
+                                        console.log('**************** Error when creating new user ******************');
+                                        console.log(error);
+                                    });
+                            } else {
+                                console.log('**************** User datas already exist ******************');
+                                //navigation.navigate('Profile');
+                            }
+                        })
+                        .catch((error) => {
+                            console.log('**************** Error when geting user datas ******************');
+                            console.log(error);
+                        });
+                }).catch((error) => {
+                    console.log('**************** Singin failed ******************');
+                    console.log(error);
+                    setTextError(invalidCodeText);
+                    setProgress(false);
+                });
+        }
     };
 
     useFocusEffect(
@@ -119,6 +131,12 @@ const Login: React.FC = ({ navigation }) => {
     return (
         <>
             <View style={styles.container}>
+
+                <Progress.Circle
+                    style={[styles.progressView, { display: progress ? 'flex' : 'none' }]}
+                    size={30}
+                    indeterminate={true}
+                />
 
                 <View style={styles.title}>
                     <Text style={styles.textIndicator}>{validation ? 'Enter received code' : 'Enter your phone number'}</Text>
@@ -166,6 +184,7 @@ const Login: React.FC = ({ navigation }) => {
 
                 <TouchableOpacity
                     style={styles.loginBtn}
+                    disabled={progress}
                     onPress={() => {
                         if (!validation) {
                             const checkValid = phoneInput.current?.isValidNumber(value) || false;
@@ -241,6 +260,11 @@ const styles = StyleSheet.create({
         marginBottom: 60,
         alignItems: "center",
         justifyContent: "center",
+    },
+    progressView: {
+        alignItems: "center",
+        justifyContent: "center",
+        marginBottom: 30
     }
 });
 
