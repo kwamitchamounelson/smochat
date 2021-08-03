@@ -26,16 +26,7 @@ const Chat = (props) => {
     const [text, setText] = useState('');
     const [progress, setProgress] = useState(true);
 
-    const getChatChannel = () => {
-        console.log("************* Current User PhoneNumber *******************");
-        console.log(currentUserPhoneNumber);
-
-        const otherUser: UserEntity = props.route.params.user;
-        console.log("************* Other user *******************");
-        console.log(otherUser);
-        setUser(otherUser);
-        props.navigation.setOptions({ headerTitle: () => <ChatProfile userData={otherUser} /> });
-
+    const getChatChannel = (otherUser: UserEntity) => {
         firebaseInstance
             .firestore()
             .collection('CHATS')
@@ -135,7 +126,15 @@ const Chat = (props) => {
             console.log("************* Current user phoneNumber from AsyncStorage : " + phone + "  *******************");
             if (phone !== null) {
                 setCurrentUserPhoneNumber(phone);
-                getChatChannel();
+                console.log("************* Current User PhoneNumber *******************");
+                console.log(currentUserPhoneNumber);
+
+                const otherUser: UserEntity = props.route.params.user;
+                console.log("************* Other user *******************");
+                console.log(otherUser);
+                setUser(otherUser);
+                props.navigation.setOptions({ headerTitle: () => <ChatProfile userData={otherUser} /> });
+                getChatChannel(otherUser);
             }
         } catch (error) {
             console.log("************* Error when getting user phone from AsyncStorage *******************");
