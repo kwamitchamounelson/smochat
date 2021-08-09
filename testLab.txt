@@ -1,0 +1,2 @@
+https://mobikul.com/create-roboscript-android-studio-run-firebase/
+https://medium.com/wantedly-engineering/android-application-testing-with-firebase-robo-test-c674e1754298
